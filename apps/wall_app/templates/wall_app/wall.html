@@ -46,8 +46,6 @@
                         <span>&times;</span>
                     </a>
                     {% endif %}
-                    {{message_check}}
-                    {{comment_check}}
                     {{message.content}}
                     <ul class="list-unstyled ml-3">
                         {% for comment in message.comments.all %}
