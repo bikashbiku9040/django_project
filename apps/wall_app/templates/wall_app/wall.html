@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>The Wall</title>
+    {% load static %}
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{% static 'wall_app/css/style.css' %}">
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="row justify-content-between">
+            <div class="col-6">
+                <h2>CodingDojo Wall</h2>
+            </div>
+            <div class="col-4 row justify-content-between">
+                <h4>Welcome, {{user_name}}!</h4>
+                <a href="/logout">Log Out</a>
+            </div>
+        </div>
+        <form action="/create_message" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <h4 for="messsageBox">Post a message</h4>
+                <textarea class="form-control" id="messsageBox" name="content" required></textarea>
+            </div>
+            <div class="form-group row justify-content-end">
+                <button type="submit" class="btn btn-primary">Post a message</button>
+            </div>
+        </form>
+        <ul class="list-unstyled">
+            {% for message in messages reversed %}
+            <li class="media">
+                <!-- <img class="mr-3" src="..." alt="Generic placeholder image"> -->
+                <div class="media-body">
+                    <h5 class="mt-0 mb-1">{{message.user.first_name}} {{message.user.last_name}} -
+                        {{message.created_at}}</h5>
+                    {% if message.user.id == request.session.logged_user and message.id in message_check.True %}
+                    <a href="/remove_message/{{message.id}}" class="close">
+                        <span>&times;</span>
+                    </a>
+                    {% endif %}
+                    {{message_check}}
+                    {{comment_check}}
+                    {{message.content}}
+                    <ul class="list-unstyled ml-3">
+                        {% for comment in message.comments.all %}
+                        <li class="media mt-3">
+                            <!-- <img src="..." alt="Generic placeholder image"> -->
+                            <div class="media-body">
+                                <h6 class="mt-0">{{comment.user.first_name}} {{comment.user.last_name}} -
+                                    {{comment.created_at}}</h6>
+                                {% if comment.user.id == request.session.logged_user and comment.id in comment_check.True %}
+                                <a href="/remove_comment/{{comment.id}}" class="close">
+                                    <span>&times;</span>
+                                </a>
+                                {% endif %}
+                                {{comment.content}}
+                            </div>
+                        </li>
+                        {% endfor %}
+                        <li class="mt-3">
+                            <form action="/create_comment" method="POST">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <h6 for="commentBox">Post a comment</h6>
+                                    <input type="hidden" name="message_id" value="{{message.id}}">
+                                    <textarea class="form-control" id="commentBox" name="content" required></textarea>
+                                </div>
+                                <div class="form-group row justify-content-end">
+                                    <button type="submit" class="btn btn-success">Post a comment</button>
+                                </div>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+
+</html>
